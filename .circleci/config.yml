@@ -32,7 +32,7 @@ jobs:
               for GOARCH in 386 amd64; do
                   EXTENSION=""
                   if [[ "${GOOS}" == "windows" ]]; then EXTENSION=".exe"; fi
-                  go build -v -o artifacts/contract-test_${GOOS}_${GOARCH}${EXTENSION}
+                  go build -v -o artifacts/${CIRCLE_PROJECT_REPONAME}_${GOOS}_${GOARCH}${EXTENSION}
               done
             done
       - run: 
@@ -42,11 +42,11 @@ jobs:
           name: "Publish Release on GitHub"
           command: |
             go get github.com/tcnksm/ghr
-            VERSION=$(./artifacts/contract-test_linux_amd64 --version)
+            VERSION=$(./artifacts/${CIRCLE_PROJECT_REPONAME}_linux_amd64 --version)
             ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
 
 workflows:
-  contract-test_workflow:
+  gha_workflow:
     jobs:
       - validate
       - deploy:
