@@ -1,2 +1,2 @@
 # gha
-Github access management tool for protected branches
+GitHub Access management tool for protected branches
