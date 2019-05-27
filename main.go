@@ -2,67 +2,74 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"log"
 	"os"
 	"strings"
 
 	"github.com/google/go-github/v25/github"
+	"github.com/jessevdk/go-flags"
 	"golang.org/x/oauth2"
 )
 
-var (
-	orgName       = flag.String("org", "", "Organization name")
-	repoNames     = flag.String("repos", "", "Repository names. Can be multiple")
-	branchNames   = flag.String("branches", "develop master", "Protected branch names. Can be multiple")
-	operationName = flag.String("operation", "add", "Operation name [add, remove]")
-	userNames     = flag.String("users", "", "User's login to change settings. Can be multiple")
-)
+var AppVersion = "v0.0.2"
+
+var opts struct {
+	Version       bool   `long:"version" description:"Show version"`
+	OrgName       string `short:"o" long:"org" description:"Organization name"`
+	RepoNames     string `short:"r" long:"repos" description:"Repository names. Can be multiple"`
+	BranchNames   string `short:"b" long:"branches" default:"develop master" description:"Protected branch names. Can be multiple"`
+	OperationName string `short:"p" long:"operation" default:"add" description:"Operation name [add, remove]"`
+	UserNames     string `short:"u" long:"users" description:"User's login to change settings. Can be multiple"`
+}
 
 func main() {
-	flag.Parse()
+	flags.Parse(&opts)
+	if opts.Version {
+		fmt.Println(AppVersion)
+		os.Exit(0)
+	}
 
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
 		log.Fatal("Unauthorized: No token present")
 	}
 
-	if len(*orgName) == 0 {
-		log.Fatal("org must be described!")
-	}
-	if len(*repoNames) == 0 {
-		log.Fatal("repos must be described!")
-	}
-	if len(*branchNames) == 0 {
-		log.Fatal("branches must be described!")
-	}
-	if len(*operationName) == 0 {
-		log.Fatal("operation must be described!")
-	}
-	if len(*userNames) == 0 {
-		log.Fatal("users must be described!")
-	}
+	// if len(opts.OrgName) == 0 {
+	// 	log.Fatal("org must be described!")
+	// }
+	// if len(*repoNames) == 0 {
+	// 	log.Fatal("repos must be described!")
+	// }
+	// if len(*branchNames) == 0 {
+	// 	log.Fatal("branches must be described!")
+	// }
+	// if len(opts.OperationName) == 0 {
+	// 	log.Fatal("operation must be described!")
+	// }
+	// if len(*userNames) == 0 {
+	// 	log.Fatal("users must be described!")
+	// }
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
 	tc := oauth2.NewClient(ctx, ts)
 	client := github.NewClient(tc)
 
-	_repos := strings.Split(*repoNames, " ")
-	_branches := strings.Split(*branchNames, " ")
-	_users := strings.Split(*userNames, " ")
+	_repos := strings.Split(opts.RepoNames, " ")
+	_branches := strings.Split(opts.BranchNames, " ")
+	_users := strings.Split(opts.UserNames, " ")
 	for _, repoName := range _repos {
 		fmt.Println(repoName)
 
-		branches, _, err := client.Repositories.ListBranches(ctx, *orgName, repoName, &github.ListOptions{PerPage: 100})
+		branches, _, err := client.Repositories.ListBranches(ctx, opts.OrgName, repoName, &github.ListOptions{PerPage: 100})
 		if err == nil {
 			for _, branch := range branches {
 
 				if contains(_branches, *branch.Name) {
 					fmt.Println("\t", *branch.Name)
 
-					protection, _, err := client.Repositories.GetBranchProtection(ctx, *orgName, repoName, *branch.Name)
+					protection, _, err := client.Repositories.GetBranchProtection(ctx, opts.OrgName, repoName, *branch.Name)
 					if err == nil {
 						preq := &github.ProtectionRequest{
 							RequiredStatusChecks: protection.RequiredStatusChecks,
@@ -85,20 +92,20 @@ func main() {
 							preq.Restrictions.Users = append(preq.Restrictions.Users, *v.Login)
 						}
 
-						if *operationName == "add" {
+						if opts.OperationName == "add" {
 							for _, u := range _users {
 								preq.Restrictions.Users = append(preq.Restrictions.Users, u)
 							}
-						} else if *operationName == "remove" {
+						} else if opts.OperationName == "remove" {
 							fmt.Println("Operation not supported yet: remove")
 							return
 						} else {
-							fmt.Println("Operation not supported: ", *operationName)
+							fmt.Println("Operation not supported: ", opts.OperationName)
 							return
 						}
 						fmt.Println("\t\tpreq.Restrictions.Users ", preq.Restrictions.Users)
 
-						_, _, err := client.Repositories.UpdateBranchProtection(ctx, *orgName, repoName, *branch.Name, preq)
+						_, _, err := client.Repositories.UpdateBranchProtection(ctx, opts.OrgName, repoName, *branch.Name, preq)
 						if err != nil {
 							fmt.Println(err)
 						}
