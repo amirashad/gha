@@ -35,21 +35,21 @@ func main() {
 		log.Fatal("Unauthorized: No token present")
 	}
 
-	// if len(opts.OrgName) == 0 {
-	// 	log.Fatal("org must be described!")
-	// }
-	// if len(*repoNames) == 0 {
-	// 	log.Fatal("repos must be described!")
-	// }
-	// if len(*branchNames) == 0 {
-	// 	log.Fatal("branches must be described!")
-	// }
-	// if len(opts.OperationName) == 0 {
-	// 	log.Fatal("operation must be described!")
-	// }
-	// if len(*userNames) == 0 {
-	// 	log.Fatal("users must be described!")
-	// }
+	if len(opts.OrgName) == 0 {
+		log.Fatal("org must be described!")
+	}
+	if len(opts.RepoNames) == 0 {
+		log.Fatal("repos must be described!")
+	}
+	if len(opts.BranchNames) == 0 {
+		log.Fatal("branches must be described!")
+	}
+	if len(opts.OperationName) == 0 {
+		log.Fatal("operation must be described!")
+	}
+	if len(opts.UserNames) == 0 {
+		log.Fatal("users must be described!")
+	}
 
 	ctx := context.Background()
 	ts := oauth2.StaticTokenSource(&oauth2.Token{AccessToken: token})
