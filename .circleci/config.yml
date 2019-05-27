@@ -1,0 +1,57 @@
+version: 2.1
+
+executors:
+  golang:
+    docker: 
+      - image: circleci/golang
+
+commands:
+  build:
+    steps:
+      - run:
+          name: Build
+          command: go build
+      - run:
+          name: Unit Test
+          command: go test
+
+jobs:
+  validate:
+    executor: golang
+    steps:
+      - checkout
+      - build
+  deploy:
+    executor: golang
+    steps:
+      - checkout
+      - run: 
+          name: Build for multiple architectures
+          command: |
+            for GOOS in darwin linux windows; do
+              for GOARCH in 386 amd64; do
+                  EXTENSION=""
+                  if [[ "${GOOS}" == "windows" ]]; then EXTENSION=".exe"; fi
+                  go build -v -o artifacts/contract-test_${GOOS}_${GOARCH}${EXTENSION}
+              done
+            done
+      - run: 
+          name: List artifacts
+          command: ls -lah artifacts/
+      - run:
+          name: "Publish Release on GitHub"
+          command: |
+            go get github.com/tcnksm/ghr
+            VERSION=$(./artifacts/contract-test_linux_amd64 --version)
+            ghr -t ${GITHUB_TOKEN} -u ${CIRCLE_PROJECT_USERNAME} -r ${CIRCLE_PROJECT_REPONAME} -c ${CIRCLE_SHA1} -delete ${VERSION} ./artifacts/
+
+workflows:
+  contract-test_workflow:
+    jobs:
+      - validate
+      - deploy:
+          requires:
+            - validate
+          filters:
+            branches:
+              only: master
