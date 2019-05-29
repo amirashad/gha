@@ -28,13 +28,9 @@ jobs:
       - run: 
           name: Build for multiple architectures
           command: |
-            for GOOS in darwin linux windows; do
-              for GOARCH in amd64; do
-                  EXTENSION=""
-                  if [[ "${GOOS}" == "windows" ]]; then EXTENSION=".exe"; fi
-                  go build -v -o artifacts/${CIRCLE_PROJECT_REPONAME}_${GOOS}_${GOARCH}${EXTENSION}
-              done
-            done
+            GOOS=darwin  GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_darwin_amd64
+            GOOS=linux   GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_linux_amd64
+            GOOS=windows GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_windows_amd64.exe
       - run: 
           name: List artifacts
           command: ls -lah artifacts/
