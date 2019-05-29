@@ -12,7 +12,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var AppVersion = "v0.0.2"
+var appVersion = "v0.0.2"
 
 var opts struct {
 	Version       bool   `long:"version" description:"Show version"`
@@ -26,7 +26,7 @@ var opts struct {
 func main() {
 	flags.Parse(&opts)
 	if opts.Version {
-		fmt.Println(AppVersion)
+		fmt.Println(appVersion)
 		os.Exit(0)
 	}
 
