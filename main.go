@@ -32,7 +32,7 @@ func main() {
 
 	token := os.Getenv("GITHUB_TOKEN")
 	if token == "" {
-		log.Fatal("Unauthorized: No token present")
+		log.Fatal("Unauthorized: No token present. Please, add GITHUB_TOKEN environment variable")
 	}
 
 	if len(opts.OrgName) == 0 {
