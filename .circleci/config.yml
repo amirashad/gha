@@ -28,9 +28,10 @@ jobs:
       - run: 
           name: Build for multiple architectures
           command: |
-            GOOS=darwin  GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_darwin_amd64
-            GOOS=linux   GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_linux_amd64
-            GOOS=windows GOARCH=amd64 go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_windows_amd64.exe
+            GOOS=darwin  GOARCH=amd64               go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_darwin_amd64
+            GOOS=linux   GOARCH=amd64               go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_linux_amd64
+            GOOS=windows GOARCH=amd64               go build -o artifacts/${CIRCLE_PROJECT_REPONAME}_windows_amd64.exe
+            GOOS=linux   GOARCH=amd64 CGO_ENABLED=0 go build -a -o artifacts/${CIRCLE_PROJECT_REPONAME}_alpinelinux_amd64
       - run: 
           name: List artifacts
           command: ls -lah artifacts/

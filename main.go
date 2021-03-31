@@ -12,7 +12,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var appVersion = "v0.0.2"
+var appVersion = "v0.0.3"
 
 var opts struct {
 	Version       bool   `long:"version" description:"Show version"`
