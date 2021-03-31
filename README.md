@@ -15,4 +15,4 @@ Add to your environment path: GITHUB_TOKEN={token-created-with-github-ui}
 
 ## Example
 To give someone merge access: 
-<pre>gha --org Some-Org --repos "repo1 repo2" --branches "develop master" --users "someuser1 someuser2" --operation add</pre>
+<pre>gha --org Some-Org --operation add --repos "repo1 repo2" --branches "develop master" --users "someuser1 someuser2"</pre>
