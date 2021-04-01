@@ -12,7 +12,7 @@ import (
 	"golang.org/x/oauth2"
 )
 
-var appVersion = "v0.0.3"
+var appVersion = "v0.0.4"
 
 var opts struct {
 	Version       bool   `long:"version" description:"Show version"`
@@ -90,6 +90,10 @@ func main() {
 
 						for _, v := range protection.Restrictions.Users {
 							preq.Restrictions.Users = append(preq.Restrictions.Users, *v.Login)
+						}
+
+						for _, v := range protection.Restrictions.Teams {
+							preq.Restrictions.Teams = append(preq.Restrictions.Teams, *v.Slug)
 						}
 
 						if opts.OperationName == "add" {
